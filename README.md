@@ -1,2 +1,4 @@
 # text_analysis
 NLP text analysis of anonymous documents
+
+This report performs a textual analysis of the infamous [Bush v. Gore 2000](https://www.law.cornell.edu/supct/html/00-949.ZPC.html) opinion. This opinion was written by an anonymous US Supreme Court Justice, likely by one of the 5 conservative Supreme Court justices serving on the court at that time: O'Connor, Rehnquist, Thomas, Kennedy and Scalia. In this analysis, we utilize a number of NLP techniques, such as hierarchical clustering, bootstrap consensus trees, characteristic vocabulary, and other methods. We have sampled the opinions written by each of the five conservative justices between the period 1999-2001 for comparison to the [Bush v. Gore 2000](https://www.law.cornell.edu/supct/html/00-949.ZPC.html) opinion, in order to ascertain the probable author of this document.
