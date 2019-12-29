@@ -18,7 +18,7 @@ suppressPackageStartupMessages(library("dplyr"))
 knitr::opts_chunk$set(collapse=TRUE, comment="#>", warning=FALSE, message=FALSE)
 ```
 
-## Introduction
+# Introduction
 
 This report performs a textual analysis of the infamous [Bush v. Gore 2000](https://www.law.cornell.edu/supct/html/00-949.ZPC.html)
 opinion. This opinion was written by an anonymous US Supreme Court Justice,
@@ -43,7 +43,10 @@ library("gridExtra")
 # library("tm")
 # library("e1071")
 # library("mlr")
+set.seed(132)
 ```
+
+### Load Data
 
 The Bush v. Gore opinion is read into R as a single `readtext` object.  We will
 also compile the opinions written by each of the five conservative justices
@@ -297,39 +300,6 @@ oconnor_dfm <- dfm(oconnor_cleaned)
 rehnquist_dfm <- dfm(rehnquist_cleaned)
 scalia_dfm <- dfm(scalia_cleaned)
 thomas_dfm <- dfm(thomas_cleaned)
-
-## It is possible to remove features such as redundant words in a DFM, however a
-## FSM must be constructed in order for the terms to be selected and removed.
-
-# opinion_dfm <- dfm_remove(opinion_dfm, pattern = c("gore", "counties"))
-# dfmat_news <- dfm_trim(dfmat_news, min_termfreq = 100)
-
-## Below shows a summary of each document feature matrix (dfm)
-
-# opinion_dfm
-# 
-# kennedy_dfm
-# 
-# oconnor_dfm
-# 
-# rehnquist_dfm
-# 
-# scalia_dfm
-# 
-# thomas_dfm
-
-## top features
-# topfeatures(opinion_dfm, 100)
-# 
-# topfeatures(kennedy_dfm, 100)
-# 
-# topfeatures(oconnor_dfm, 100)
-# 
-# topfeatures(rehnquist_dfm, 100)
-# 
-# topfeatures(scalia_dfm, 100)
-# 
-# topfeatures(thomas_dfm, 100)
 ```
 
 ### Top Features
@@ -407,66 +377,13 @@ grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 3,
              top = "Top 20 terms for each document corpus")
 ```
 
-<!-- ### Construct the LSA model -->
 
-<!-- [Latent semantic analysis (LSA)](https://en.wikipedia.org/wiki/Latent_semantic_analysis) -->
-<!-- is a technique in natural language processing -->
-<!-- (NLP), in particular distributional semantics, of analyzing relationships -->
-<!-- between a set of documents and the terms they contain by producing a set of -->
-<!-- concepts related to the documents and terms. LSA assumes that words that are -->
-<!-- close in meaning will occur in similar pieces of text (the distributional -->
-<!-- hypothesis). A matrix containing word counts per document (rows represent unique -->
-<!-- words and columns represent each document) is constructed from a large piece of -->
-<!-- text and a mathematical technique called singular value decomposition (SVD) is -->
-<!-- used to reduce the number of rows while preserving the similarity structure -->
-<!-- among columns. -->
-
-```{r}
-## construction LSA models of the corpus DFMs
-# kennedy_lsa <- textmodel_lsa(kennedy_dfm)
-# oconnor_lsa <- textmodel_lsa(oconnor_dfm)
-# rehnquist_lsa <- textmodel_lsa(rehnquist_dfm)
-# scalia_lsa <- textmodel_lsa(scalia_dfm)
-# thomas_lsa <- textmodel_lsa(thomas_dfm)
-```
-
-<!-- Now that LSA models have been constructed for each corpus, the can be applied -->
-<!-- to the Opinion piece. The distance of this piece can be represented in the -->
-<!-- reduced 2-dimensional space. -->
-
-### Comparing Document Similarity
+### Comparing Document Similarity by Cosine Distance
 
 Documents are then compared by taking the cosine of the angle between the two
 vectors (or the dot product between the normalizations of the two vectors)
 formed by any two columns. Values close to 1 represent very similar documents
 while values close to 0 represent very dissimilar documents.
-
-<!-- ```{r} -->
-<!-- # https://quanteda.io/articles/pkgdown/examples/lsa.html -->
-<!-- # querydfm1 <- opinion_dfm %>% dfm_select(pattern = kennedy_dfm) -->
-<!-- # newq1 <- predict(kennedy_lsa, newdata = querydfm1) -->
-<!-- # newq1$docs_newspace[, 1:2] -->
-<!-- #  -->
-<!-- # querydfm2 <- opinion_dfm %>% dfm_select(pattern = oconnor_dfm) -->
-<!-- # newq2 <- predict(oconnor_lsa, newdata = querydfm2) -->
-<!-- # newq2$docs_newspace[, 1:2] -->
-<!-- #  -->
-<!-- # querydfm3 <- opinion_dfm %>% dfm_select(pattern = rehnquist_dfm) -->
-<!-- # newq3 <- predict(rehnquist_lsa, newdata = querydfm3) -->
-<!-- # newq3$docs_newspace[, 1:2] -->
-<!-- #  -->
-<!-- # querydfm3 <- opinion_dfm %>% dfm_select(pattern = rehnquist_dfm) -->
-<!-- # newq3 <- predict(rehnquist_lsa, newdata = querydfm3) -->
-<!-- # newq3$docs_newspace[, 1:2] -->
-<!-- #  -->
-<!-- # querydfm4 <- opinion_dfm %>% dfm_select(pattern = scalia_dfm) -->
-<!-- # newq4 <- predict(scalia_lsa, newdata = querydfm4) -->
-<!-- # newq4$docs_newspace[, 1:2] -->
-<!-- #  -->
-<!-- # querydfm5 <- opinion_dfm %>% dfm_select(pattern = thomas_dfm) -->
-<!-- # newq5 <- predict(thomas_lsa, newdata = querydfm5) -->
-<!-- # newq5$docs_newspace[, 1:2] -->
-<!-- ``` -->
 
 ```{r}
 # https://quanteda.io/reference/textstat_simil.html
@@ -497,6 +414,13 @@ textstat_simil(thomas_dfm, opinion_dfm, method = c("cosine"))
 The Opinion piece appears closest on average to the Kennedy and OConnor corpus
 documents.
 
+### Comparing Document Distance by Cosine Distance
+
+Documents are then compared by taking the cosine of the angle between the two
+vectors (or the dot product between the normalizations of the two vectors)
+formed by any two columns. Values close to 1 represent very similar documents
+while values close to 0 represent very dissimilar documents.
+
 ```{r}
 cat("Average Document similarity of Opinion to Kennedy Corpus Documents \n")
 mean(textstat_simil(kennedy_dfm, opinion_dfm, method = c("cosine"))@x)
@@ -525,441 +449,148 @@ cat("Average Document distance of Opinion to Thomas Corpus Documents \n")
 mean(textstat_dist(thomas_dfm, opinion_dfm, method = c("manhattan"))@x)
 ```
 
+### Word Clouds
+
+#### Opinion Word Cloud
+
+```{r}
+textplot_wordcloud(opinion_dfm, max_words = 100)
+```
+
+#### Kenndy Word Cloud
+
+```{r}
+textplot_wordcloud(kennedy_dfm, max_words = 100)
+```
+
+#### O'Connor Word Cloud
+
+```{r}
+textplot_wordcloud(oconnor_dfm, max_words = 100)
+```
+
+#### Rehnquist Word Cloud
+
+```{r}
+textplot_wordcloud(rehnquist_dfm, max_words = 100)
+```
+
+#### Scalia Word Cloud
+
+```{r}
+textplot_wordcloud(scalia_dfm, max_words = 100)
+```
+
+#### Thomas Word Cloud
+
+```{r}
+textplot_wordcloud(thomas_dfm, max_words = 100)
+```
+
+### Lexical Diversity
+
+`textstat_lexdiv()` calcuates lexical diversity in various measures based on the
+number of unique types of tokens and the length of a document. It is useful for
+analysing speakers or writers linguistic skill, or complexity of ideas expressed
+in documents.
+
+```{r}
+opinion_lexdiv <- textstat_lexdiv(opinion_dfm)
+kennedy_lexdiv <- textstat_lexdiv(kennedy_dfm)
+oconnor_lexdiv <- textstat_lexdiv(oconnor_dfm)
+rehnquist_lexdiv <- textstat_lexdiv(rehnquist_dfm)
+scalia_lexdiv <- textstat_lexdiv(scalia_dfm)
+thomas_lexdiv <- textstat_lexdiv(thomas_dfm)
+
+# head(opinion_lexdiv)
+```
+
+The plot below compares the lexical diversity of 
+
+```{r}
+par(mfrow=c(3, 2))
+plot(kennedy_lexdiv$TTR, type = 'l', xaxt = 'n', xlab = NULL, ylab = "TTR",
+     main = "Kennedy Lexical Diversity")
+abline(h = opinion_lexdiv$TTR[1], col = "red")
+abline(h = mean(kennedy_lexdiv$TTR), col = "blue")
+
+plot(oconnor_lexdiv$TTR, type = 'l', xaxt = 'n', xlab = NULL, ylab = "TTR",
+     ylim=c(0.2, 0.5), main = "OConnor Lexical Diversity")
+abline(h = opinion_lexdiv$TTR[1], col = "red")
+abline(h = mean(oconnor_lexdiv$TTR), col = "blue")
+
+plot(rehnquist_lexdiv$TTR, type = 'l', xaxt = 'n', xlab = NULL, ylab = "TTR",
+     main = "Rehnquist Lexical Diversity")
+abline(h = opinion_lexdiv$TTR[1], col = "red")
+abline(h = mean(rehnquist_lexdiv$TTR), col = "blue")
+
+plot(scalia_lexdiv$TTR, type = 'l', xaxt = 'n', xlab = NULL, ylab = "TTR",
+     main = "Scalia Lexical Diversity")
+abline(h = opinion_lexdiv$TTR[1], col = "red")
+abline(h = mean(scalia_lexdiv$TTR), col = "blue")
+
+plot(thomas_lexdiv$TTR, type = 'l', xaxt = 'n', xlab = NULL, ylab = "TTR",
+     main = "Thomas Lexical Diversity")
+abline(h = opinion_lexdiv$TTR[1], col = "red")
+abline(h = mean(thomas_lexdiv$TTR), col = "blue")
+```
+
+### Cluster Dendrogram
+
+`textstat_dist()` calcuates similarites of documents or features for various
+measures. Its output is compatible with R's `dist()`, so hierachical clustering
+can be perfromed without any transformation.
+
+Below is a dendrogram of all of the documents from all conservative SC justices,
+including the Bush v. Gore opinion (can be located in the center).
+
+```{r fig.height=12, fig.width= 18}
+# library(dendextend)
+all_docs <- bind_rows(opinion, kennedy, oconnor, rehnquist, scalia, thomas)
+all_docs <- corpus(all_docs)
+all_docs_lower <- tolower(all_docs)
+all_docs_toks <- tokens(all_docs_lower)
+all_docs_nostop <- tokens_select(all_docs_toks, pattern = stopwords('en'),
+                                selection = 'remove')
+all_docs_cleaned <- tokens_remove(tokens(all_docs_nostop, remove_punct = TRUE,
+                                  remove_numbers = TRUE), stopwords("english"))
+all_docs_dfm <- dfm(all_docs_cleaned)
+tstat_dist <- as.dist(textstat_dist(all_docs_dfm))
+clust <- hclust(tstat_dist)
+plot(clust, xlab = "Distance", ylab = NULL, main = "Cluster Dendrogram")
+
+# more info in clustering
+# http://mlwiki.org/index.php/Document_Clustering
+```
+
+
+### Selecting Keywords and Keyphrases
+
 You can see how keywords are used in the actual contexts in a concordance view
 produced by `kwic()`
 
 ```{r}
-# kw_immig <- kwic(toks, pattern =  'immig*')
-# head(kw_immig, 10)
+opinion_kw <- kwic(opinion_corpus, pattern =  'vot*')
+head(opinion_kw, 10)
 ```
 
 You can generate n-grams in any lengths from a tokens using `tokens_ngrams()`. 
 N-grams are a sequence of tokens from already tokenized text objects.
 
 ```{r}
+## where we left off with quanteda
+## https://tutorials.quanteda.io/basic-operations/fcm/fcm/
 # toks_ngram <- tokens_ngrams(toks, n = 2:4)
 ```
 
 ### Naive Bayes
 
 ```{r}
-# #naive bayes
-# library("e1071")
+# https://tutorials.quanteda.io/machine-learning/nb/
+
 ```
 
-<!-- ### Random Forest -->
-
-<!-- ```{r} -->
-<!-- # # https://www.displayr.com/text-analysis-hooking-up-your-term-document-matrix-to-custom-r-code/ -->
-<!-- # # devtools::install_github("Displayr/flipMultivariates") -->
-<!-- # library(flipMultivariates) # Our package containing the Random Forest routine -->
-<!-- # library(tm) # The package needed to convert the sparse matrix -->
-<!-- # tdm <- as.matrix(term.document.matrix) # Convert the sparse matrix before use -->
-<!-- # colnames(tdm) <- make.names(colnames(tdm)) # Ensure the column names are appropriate for use in an R model -->
-<!-- # df <- data.frame(TweetSource = tweetSource, tdm) # Combine the outcome variable with the term document matrix -->
-<!-- # f <- formula(paste0("TweetSource ~ ", paste0(colnames(tdm), collapse = "+"))) # Create the R Formula which describes the relationship we are interrogating -->
-<!-- # rf <- RandomForest(f, df) # Run the random forest model -->
-<!-- ``` -->
-
-
-<!-- ### Stylometric Analysis -->
-
-<!-- #### Hierarchical cluster analysis -->
-
-<!-- A first statistical technique we can apply to this data set is hierarchical -->
-<!-- cluster analysis. The goal of this procedure is to generate a tree structure or -->
-<!-- dendrogram, which will help to identify the most important groups or clusters of -->
-<!-- texts in the data. For this procedure we will first calculate the distance -->
-<!-- between corpuses of opinions of the five conservative Supreme Court justices and -->
-<!-- the anonymous Bush v. Gore opinion. To calculate these distances, we combine can -->
-<!-- apply a distance metric to the rows in the frequency table described above like, -->
-<!-- for instance, the well-known Euclidean distance metric. The measure of distance -->
-<!-- is an important tool in statistical analysis. It quantifies dissimilarity -->
-<!-- between sample data for numerical computation. A popular choice of distance -->
-<!-- metric is the Euclidean distance, which is the square root of sum of squares of -->
-<!-- attribute differences. We will use Burrows's Delta, a well-known distance metric -->
-<!-- in stylometry, which has been reported to work well in a variety of text -->
-<!-- analysis tasks in stylometry.  -->
-
-<!-- Such a technique is useful to estimate the stylistic distance (hence `Delta`) -->
-<!-- between two texts and can be used as the input for various clustering -->
-<!-- algorithms. When comparing the frequency difference for a word in two texts, -->
-<!-- the Delta metric will also take into account the average fluctuations in that -->
-<!-- word's frequency in the other texts in the corpus. The resulting score, "Delta", -->
-<!-- can therefore give us an idea of the stylistic dissimilarity between two texts: -->
-<!-- the larger Delta, the more dissimilar the texts are from a stylistic point of -->
-<!-- view. Based on the resulting distances, we can now build a dendrogram in a -->
-<!-- bottom-up fashion, so to speak, starting at the leafs, representing the -->
-<!-- individual texts in our case. We begin by joining the two texts which had the -->
-<!-- lowest Delta score, and then we combine these into a new node at a slightly -->
-<!-- higher level in the tree. Next, we combine the two texts (or a text and one of -->
-<!-- the newly formed nodes) that had the second lowest Delta and we also combine -->
-<!-- these in a new node. Then the third node, etc., until all nodes have eventually -->
-<!-- been combined into a single top node. A example of the kind tree structure which -->
-<!-- can be build in such a way is offered in Figure 1, where we have carried out a -->
-<!-- cluster analysis on the frequencies of the 500 words which were most frequent -->
-<!-- throughout the corpus. -->
-
-<!-- ```{r} -->
-<!-- # euclidean distance measure -->
-<!-- # https://rstudio-pubs-static.s3.amazonaws.com/266040_d2920f956b9d4bd296e6464a5ccc92a1.html -->
-<!-- # d <- dist(as.matrix(mtcars)) -->
-<!-- # hc <- hclust(d)                # apply hirarchical clustering  -->
-<!-- # plot(hc) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- # unsupervised hierarchical cluster analysis -->
-<!-- # may want to rename the .txt files to be SCJ - case.txt so the authorship is -->
-<!-- # obvious when clustered in a tree -->
-
-<!-- ``` -->
-
-<!-- It deserves emphasis that this form of cluster analysis is completely -->
-<!-- "unsupervised": it has no pre-conceived ideas about the data or any potential -->
-<!-- groupings in it. The analysis only has access to the lexical frequency -->
-<!-- information about the texts and is not guided by the researcher to a specific -->
-<!-- hypothesis. Unfortunately, cluster analyses have reported to yield somewhat -->
-<!-- unstable dendrograms, heavily dependent on the number of words that are for -->
-<!-- instance analyzed and a number of other technical parameters which are beyond -->
-<!-- the scope of the paper. Therefore, it is common nowadays in stylometry to -->
-<!-- complement cluster experiments with Bootstrap Consensus Trees (BCT). -->
-
-<!-- In this iterative procedure, we run a series of cluster analyses, each time -->
-<!-- inspecting different frequency bands, starting for instance with the band of the -->
-<!-- 1-100 most frequent words (MFW), then the 50-150 MFW, 100-200 MFW and so on, -->
-<!-- until all frequency bands have been analyzed. The results of the cluster -->
-<!-- analyses can then be combined in a "consensus tree." In this representation, we -->
-<!-- collapse cluster nodes that are not observed in at least 50% of the analyses. -->
-<!-- While BCT and similar procedures have known successful applications in the study -->
-<!-- of language history, the technique has also recently been ported to -->
-<!-- computational stylistics. 34 It is interesting for text analysis, because it can -->
-<!-- test for the robustness of stylistic similarities across different frequency -->
-<!-- bands and thus can give more solid results. -->
-
-<!-- ```{r} -->
-<!-- # bootstrap consensus trees -->
-<!-- # library(ape) -->
-<!-- # library(MASS) -->
-<!-- # set.seed(123) -->
-<!-- #  -->
-<!-- # tr <- rcoal(10) -->
-<!-- #  -->
-<!-- # # 'evolve' copy number down the tree using Brownian motion -->
-<!-- # cn_matrix <- ceiling( t( mvrnorm(100, mu=rep(3,10), Sigma=vcv(tr)))) -->
-<!-- #  -->
-<!-- # # Then all you need to do is create a function to estimate your tree with the -->
-<!-- # # matrix as input. Here's the simplest one: -->
-<!-- # estimate_tr <- function(m) nj(dist(m, method="manhattan")) -->
-<!-- # point_est <- estimate_tr(cn_matrix) -->
-<!-- # bs <- boot.phylo(point_est, cn_matrix, estimate_tr, trees=TRUE)   -->
-<!-- # con <- consensus(bs$trees, p=0.5) -->
-
-<!-- # https://cran.r-project.org/web/packages/phangorn/vignettes/IntertwiningTreesAndNetworks.html -->
-<!-- ``` -->
-
-<!-- ### Characteristic Vocabulary -->
-
-<!-- It would be interesting to find out which lexical items a computational analysis -->
-<!-- is to single out as most characteristic for each cluster. To this end, we will -->
-<!-- make use of a "parsimonious language model"" or PLM. This technique stems from -->
-<!-- the field of Informational Retrieval, which deals for instance with the study of -->
-<!-- search engines like Yahoo or Google search. Using PLMs, search engines try to -->
-<!-- determine which vocabulary is most typical of a given text amidst a corpus of -->
-<!-- other texts. Thus, a PLM tries to estimate for each document in a collection, -->
-<!-- which words a user would be most likely to use as query terms, when they are -->
-<!-- searching for this specific document. A user is, for instance, unlikely to use -->
-<!-- a highly common function word to retrieve a specific document, just like they -->
-<!-- are unlikely to use an uncommon spelling error in a document which is also -->
-<!-- extremely infrequent in other texts. PLMs try to come up with a "model" for each -->
-<!-- document that tries to capture these probabilities and trades off between the -->
-<!-- most likely and most unlikely words in a document. -->
-
-<!-- ```{r 100_words_opinion} -->
-<!-- # most common words in each corpus -->
-<!-- ``` -->
-
-<!-- ```{r 100_words_kennedy} -->
-
-<!-- ``` -->
-
-<!-- ```{r 100_words_oconnor} -->
-
-<!-- ``` -->
-
-<!-- ```{r 100_words_rehnquist} -->
-
-<!-- ``` -->
-
-<!-- ```{r 100_words_scalia} -->
-
-<!-- ``` -->
-
-<!-- ```{r 100_words_thomas} -->
-
-<!-- ``` -->
-
-
-<!-- ### Other -->
-
-<!-- ```{r} -->
-<!-- # #Create the dfm: -->
-<!-- # dfm_bvg <- dfm(tokes) -->
-<!-- # View(dfm_bvg) -->
-<!-- #  -->
-<!-- # # Remove sparse features? -->
-<!-- #  -->
-<!-- # # some sort of similarity measure -->
-<!-- # #http://text2vec.org/similarity.html#cosine_similarity_with_tf-idf -->
-<!-- # library("text2vec") -->
-<!-- #  -->
-<!-- # #naive bayes -->
-<!-- # library("e1071") -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- # #generate n-grams in any lengths from a tokens using tokens_ngrams(). N-grams -->
-<!-- # are a sequence of #tokens from already tokenized text objects. -->
-<!-- #  -->
-<!-- # ngram <- tokens_ngrams(toks, n = 2:4) -->
-<!-- # head(ngram[[1]], 50) -->
-<!-- # #ngram -->
-<!-- #  -->
-<!-- # #Selective ngrams -->
-<!-- # #While tokens_ngrams() generates n-grams or skip-grams in all possible  -->
-<!-- # #combinations of tokens, tokens_compound() generates n-grams more selectively.  -->
-<!-- # #For example, you can make negation bi-grams using phrase() and a wild card (*). -->
-<!-- #  -->
-<!-- # neg_bigram <- tokens_compound(toks, pattern = phrase('not *')) -->
-<!-- # neg_bigram <- tokens_select(neg_bigram, pattern = phrase('not_*')) -->
-<!-- # head(neg_bigram[[1]], 50) -->
-<!-- #  -->
-<!-- # #tokens_ngrans() is an efficient function, but it returns a large object if  -->
-<!-- # #multiple values are given to n or skip. Since n-grams inflates the size of  -->
-<!-- # #objects without adding much information, we recommend to generate n-grams more  -->
-<!-- # #selectively using tokens_compound(). -->
-<!-- #  -->
-<!-- # #Document Feature Matrix -->
-<!-- # #https://www.r-bloggers.com/who-wrote-that-anonymous-nyt-op-ed-text-similarity-analyses-with-r/ -->
-<!-- # #https://www.rjionline.org/stories/we-put-data-science-to-the-test-to-try-to-uncover-the-mystery-author-of-the -->
-<!-- # #https://github.com/mkearney/resist_oped -->
-<!-- # #https://en.wikipedia.org/wiki/Document-term_matrix -->
-<!-- #  -->
-<!-- # require(fortunes) -->
-<!-- # require(tm) -->
-<!-- # sentences <- NULL -->
-<!-- # for (i in 1:10) sentences <- c(sentences,fortune(i)$quote) -->
-<!-- # d <- data.frame(textCol =sentences ) -->
-<!-- # ds <- DataframeSource(d) -->
-<!-- # dsc<-Corpus(ds) -->
-<!-- # dtm<- DocumentTermMatrix(dsc, control = list(weighting = weightTf, stopwords = TRUE)) -->
-<!-- # dictC <- Dictionary(dtm) -->
-<!-- # # The query below is created from words in fortune(1) and fortune(2) -->
-<!-- # newQry <- data.frame(textCol = "lets stand up and be counted seems to work undocumented") -->
-<!-- # newQryC <- Corpus(DataframeSource(newQry)) -->
-<!-- # dtmNewQry <- DocumentTermMatrix(newQryC, control = list(weighting=weightTf,stopwords=TRUE,dictionary=dict1)) -->
-<!-- # dictQry <- Dictionary(dtmNewQry) -->
-<!-- # # Below does a naive similarity (number of features in common) -->
-<!-- # apply(dtm,1,function(x,y=dictQry){length(intersect(names(x)[x!= 0],y))}) -->
-<!-- #  -->
-<!-- # #Transforming Text convert to a data frame and then to a corpus. -->
-<!-- # df <- do.call("rbind", lapply(rdmTweets, as.data.frame)) -->
-<!-- # dim(df) -->
-<!-- #  -->
-<!-- # library(tm) -->
-<!-- # # build a corpus, which is a collection of text documents -->
-<!-- # # VectorSource specifies that the source is character vectors. -->
-<!-- # myCorpus <- Corpus(VectorSource(df$text)) -->
-<!-- #  -->
-<!-- # #The corpus needs a couple of transformations, including changing letters to  -->
-<!-- # #lower case, removing punctuations/numbers and removing stop words. The general  -->
-<!-- # #English stop-word list is tailored by adding "available" and "via" and removing "r". -->
-<!-- # myCorpus <- tm_map(myCorpus, tolower) -->
-<!-- #  -->
-<!-- # # remove punctuation -->
-<!-- # myCorpus <- tm_map(myCorpus, removePunctuation) -->
-<!-- # # remove numbers -->
-<!-- # myCorpus <- tm_map(myCorpus, removeNumbers) -->
-<!-- # # remove stopwords -->
-<!-- # # keep "r" by removing it from stopwords -->
-<!-- # myStopwords <- c(stopwords("english"), "available", "via") -->
-<!-- # idx <- which(myStopwords == "r") -->
-<!-- # myStopwords <- myStopwords[-idx] -->
-<!-- # myCorpus <- tm_map(myCorpus, removeWords, myStopwords) -->
-<!-- #  -->
-<!-- # #Stemming Words -->
-<!-- #  -->
-<!-- # #In many cases, words need to be stemmed to retrieve their radicals. For  -->
-<!-- # #instance, "example" and "examples" are both stemmed to "exampl". However, after -->
-<!-- # #that, one may want to complete the stems to their original forms, so that the  -->
-<!-- # #words would look "normal". -->
-<!-- #  -->
-<!-- # dictCorpus <- myCorpus -->
-<!-- # # stem words in a text document with the snowball stemmers, -->
-<!-- # # which requires packages Snowball, RWeka, rJava, RWekajars -->
-<!-- # myCorpus <- tm_map(myCorpus, stemDocument) -->
-<!-- # # inspect the first three "documents" -->
-<!-- # inspect(myCorpus[1:3]) -->
-<!-- # # stem completion -->
-<!-- # myCorpus <- tm_map(myCorpus, stemCompletion, dictionary=dictCorpus) -->
-<!-- #  -->
-<!-- # #Print the first three documents in the built corpus. -->
-<!-- # inspect(myCorpus[1:3]) -->
-<!-- #  -->
-<!-- # #Something unexpected in the above stemming and stem completion is that, word  -->
-<!-- # #"mining" is first stemmed to "mine", and then is completed to "miners", instead -->
-<!-- # #of "mining", although there are many instances of "mining" in the tweets,  -->
-<!-- # #compared to only one instance of "miners". -->
-<!-- #  -->
-<!-- # #Building a Document-Term Matrix -->
-<!-- #  -->
-<!-- # myDtm <- TermDocumentMatrix(myCorpus, control = list(minWordLength = 1)) -->
-<!-- # inspect(myDtm[266:270,31:40]) -->
-<!-- # #A term-document matrix (5 terms, 10 documents) -->
-<!-- # #Non-/sparse entries: 9/41 -->
-<!-- # #Sparsity : 82% -->
-<!-- # #Maximal term length: 12 -->
-<!-- # #Weighting : term frequency (tf) -->
-<!-- #  -->
-<!-- # #Frequent Terms and Associations -->
-<!-- #  -->
-<!-- # findFreqTerms(myDtm, lowfreq=10) -->
-<!-- #  -->
-<!-- # # which words are associated with "r"? -->
-<!-- # findAssocs(myDtm, 'r', 0.30) -->
-<!-- #  -->
-<!-- # #a <- tm_map(a, removeWords, stopwords("english")) -->
-<!-- #  -->
-<!-- # #Popular document embedding and similarity measures: -->
-<!-- #  -->
-<!-- # #Doc2Vec -->
-<!-- # #Average w2v vectors -->
-<!-- # #Weighted average w2v vectors (e.g. tf-idf) -->
-<!-- # #RNN-based embeddings (e.g. deep LSTM networks) -->
-<!-- #  -->
-<!-- # #Latent Semantic Indexing -->
-<!-- # #https://medium.com/@adriensieg/text-similarities-da019229c894 -->
-<!-- #  -->
-<!-- # #random forest  -->
-<!-- #  -->
-<!-- # #naive bayes -->
-<!-- #  -->
-<!-- # #Getting started with Naive Bayes -->
-<!-- # #Install the package -->
-<!-- # #install.packages("e1071") -->
-<!-- #  -->
-<!-- # #Loading the library -->
-<!-- # library(e1071) -->
-<!-- # ?naiveBayes #The documentation also contains an example implementation of Titanic dataset -->
-<!-- #  -->
-<!-- # #Next load the Titanic dataset -->
-<!-- # data("Titanic") -->
-<!-- #  -->
-<!-- # #Save into a data frame and view it -->
-<!-- # Titanic_df=as.data.frame(Titanic) -->
-<!-- #  -->
-<!-- # #Creating data from table -->
-<!-- # repeating_sequence=rep.int(seq_len(nrow(Titanic_df)), Titanic_df$Freq)  -->
-<!-- # #This will repeat each combination equal to the frequency of each combination -->
-<!-- #  -->
-<!-- # #Create the dataset by row repetition created -->
-<!-- # Titanic_dataset=Titanic_df[repeating_sequence,] -->
-<!-- #  -->
-<!-- # #We no longer need the frequency, drop the feature -->
-<!-- # Titanic_dataset$Freq=NULL -->
-<!-- #  -->
-<!-- # #The data is now ready for Naive Bayes to process. Let's fit the model -->
-<!-- # #Fitting the Naive Bayes model -->
-<!-- # Naive_Bayes_Model=naiveBayes(Survived ~., data=Titanic_dataset) -->
-<!-- # #What does the model say? Print the model summary -->
-<!-- # Naive_Bayes_Model -->
-<!-- #  -->
-<!-- # #Call: -->
-<!-- # #    naiveBayes.default(x = X, y = Y, laplace = laplace) -->
-<!-- #  -->
-<!-- # #A-priori probabilities: -->
-<!-- # #    Y -->
-<!-- # #No      Yes  -->
-<!-- # #0.676965 0.323035  -->
-<!-- #  -->
-<!-- # #Conditional probabilities: -->
-<!-- # #    Class -->
-<!-- # #Y          1st          2nd         3rd         Crew -->
-<!-- # #No    0.08187919  0.11208054  0.35436242  0.45167785 -->
-<!-- # #Yes   0.28551336  0.16596343  0.25035162  0.29817159 -->
-<!-- #  -->
-<!-- # #Sex -->
-<!-- # #Y          Male         Female -->
-<!-- # #No    0.91543624  0.08456376 -->
-<!-- # #Yes   0.51617440  0.48382560 -->
-<!-- #  -->
-<!-- # #Age -->
-<!-- # #Y         Child         Adult -->
-<!-- # #No    0.03489933  0.96510067 -->
-<!-- # #Yes   0.08016878  0.91983122 -->
-<!-- #  -->
-<!-- # #Prediction on the dataset -->
-<!-- # NB_Predictions=predict(Naive_Bayes_Model,Titanic_dataset) -->
-<!-- # #Confusion matrix to check accuracy -->
-<!-- # table(NB_Predictions,Titanic_dataset$Survived) -->
-<!-- # #NB_Predictions      No      Yes -->
-<!-- # #No      1364    362 -->
-<!-- # #Yes     126     349 -->
-<!-- #  -->
-<!-- # #Getting started with Naive Bayes in mlr -->
-<!-- # #Install the package -->
-<!-- # #install.packages("mlr") -->
-<!-- # #Loading the library -->
-<!-- # library(mlr) -->
-<!-- #  -->
-<!-- # #Create a classification task for learning on Titanic Dataset and specify the target feature -->
-<!-- # task = makeClassifTask(data = Titanic_dataset, target = "Survived") -->
-<!-- # #Initialize the Naive Bayes classifier -->
-<!-- # selected_model = makeLearner("classif.naiveBayes") -->
-<!-- # #Train the model -->
-<!-- # NB_mlr = train(selected_model, task) -->
-<!-- #  -->
-<!-- # #Read the model learned   -->
-<!-- # NB_mlr$learner.model -->
-<!-- # #Naive Bayes Classifier for Discrete Predictors -->
-<!-- #  -->
-<!-- # #Call: -->
-<!-- # #    naiveBayes.default(x = X, y = Y, laplace = laplace) -->
-<!-- #  -->
-<!-- # #A-priori probabilities: -->
-<!-- # #    Y -->
-<!-- # #No      Yes  -->
-<!-- # #0.676965 0.323035  -->
-<!-- #  -->
-<!-- # #Conditional probabilities: -->
-<!-- # #    Class -->
-<!-- # #Y               1st         2nd         3rd         Crew -->
-<!-- # #No      0.08187919  0.11208054  0.35436242  0.45167785 -->
-<!-- # #Yes     0.28551336  0.16596343  0.25035162  0.29817159 -->
-<!-- #  -->
-<!-- # #Sex -->
-<!-- # #Y               Male        Female -->
-<!-- # #No     0.91543624  0.08456376 -->
-<!-- # #Yes     0.51617440  0.48382560 -->
-<!-- #  -->
-<!-- # #Age -->
-<!-- # #Y           Child       Adult -->
-<!-- # #No      0.03489933  0.96510067 -->
-<!-- # #Yes     0.08016878  0.91983122 -->
-<!-- #  -->
-<!-- # #Predict on the dataset without passing the target feature -->
-<!-- # predictions_mlr = as.data.frame(predict(NB_mlr, newdata = Titanic_dataset[,1:3])) -->
-<!-- #  -->
-<!-- # ##Confusion matrix to check accuracy -->
-<!-- # table(predictions_mlr[,1],Titanic_dataset$Survived) -->
-<!-- # #No      Yes -->
-<!-- # #No    1364    362 -->
-<!-- # #Yes   126     349 -->
-<!-- #  -->
-<!-- # #svm  -->
-
-<!-- #CNN  -->
-<!-- ``` -->
+*Session Info*
 
 ```{r sessionInfo}
 sessionInfo()
