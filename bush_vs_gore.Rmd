@@ -1,7 +1,7 @@
 ---
 title: "Bush_v_Gore_2000"
 author: "Theo Killian"
-date: "November 7, 2019"
+date: "`r Sys.Date()`"
 output:
   html_document:
     code_folding: hide
@@ -55,251 +55,16 @@ written in 2000). Each body of documents from each justice can be read a single
 `readtext` 'glob' where each single document can be individually selected or
 evaluated together a single object.
 
-```{r load_data}
-opinion <- readtext("./opinions/Bush_v_Gore.txt")
-
-KENNEDY <- system.file("./opinions/Kennedy/", package = "readtext")
-kennedy <- readtext(paste0(KENNEDY, "./opinions/Kennedy/*"))
-
-OCONNOR <- system.file("./opinions/OConnor/", package = "readtext")
-oconnor <- readtext(paste0(OCONNOR, "./opinions/OConnor/*"))
-
-REHNQUIST <- system.file("./opinions/Rehnquist/", package = "readtext")
-rehnquist <- readtext(paste0(REHNQUIST, "./opinions/Rehnquist/*"))
-
-SCALIA <- system.file("./opinions/Scalia/", package = "readtext")
-scalia <- readtext(paste0(SCALIA, "./opinions/Scalia/*"))
-
-THOMAS <- system.file("./opinions/Thomas/", package = "readtext")
-thomas <- readtext(paste0(THOMAS, "./opinions/Thomas/*"))
-```
-
-### Corpus Generation
-
-[Corpuses](https://tutorials.quanteda.io/basic-operations/corpus/corpus/) for
-each SC justice are generated using the `quanteda` R package. A corpus is a data
-frame consisting of a character vector for each documents. The summary of each
-corpus lists the statistics on `Types,` `Tokens` and `Sentences` for each
-document.
-
-```{r corpuses}
-opinion_corpus <- corpus(opinion)
-kennedy_corpus <- corpus(kennedy)
-oconnor_corpus <- corpus(oconnor)
-rehnquist_corpus <- corpus(rehnquist)
-scalia_corpus <- corpus(scalia)
-thomas_corpus <- corpus(thomas)
-
-# summary(opinion_corpus)
-# Corpus consisting of 1 document:
-# 
-#             Text Types Tokens Sentences
-#  Bush_v_Gore.txt  1066   4049       168
-# summary(kennedy_corpus)
-# Corpus consisting of 25 documents:
-# 
-#                                                                      Text Types Tokens Sentences
-#               01 - City of Monterey v Del Monte Dunes at Monterey Ltd.txt  2224  12227       578
-#                                                      02 - Glover v US.txt   732   2444       120
-#                                    03 - City of West Covina v Perkins.txt   907   3271       159
-#                                            04 - INS v Aguirre-Aguirre.txt  1303   6408       309
-#                                           05 - US v Haggar Apparel Co.txt  1155   4846       211
-#                                                     06 - Peguero v US.txt   650   2536       118
-#                                                     07 - US v Johnson.txt   732   2642       113
-#                     08 - TrafFix Devices Inc v Marketing Displays Inc.txt  1026   4269       190
-#                                            09 - US v United Foods Inc.txt  1087   4020       210
-#                                                       10 - US v Locke.txt  1975   9406       447
-#                                                     11 - Fischer v US.txt  1208   4985       200
-#                                                    12 - Mitchell v US.txt  1388   5827       275
-#                                  13 - Legal Services Corp v Velazquez.txt  1306   5165       242
-#                                                   14 - Saucier v Katz.txt  1195   5055       227
-#  15 - Board of Regents of University of Wisconsin System v Southworth.txt  1469   5984       305
-#                                                  16 - Rice v Cayetano.txt  2306  10397       530
-#                                                   17 - Garner v Jones.txt  1079   4593       236
-#                                            18 - Tuan Anh Nguyen v INS.txt  1465   7039       284
-#                                  19 - Circuit City Stores Inc v Adams.txt  1417   6384       268
-#                                                 20 - Slack v McDaniel.txt   989   5090       245
-#                             21 - US v Playboy Entertainment Group Inc.txt  1903   8539       417
-#                  22 - Amoco Production Co v Southern Ute Indian Tribe.txt  1337   5242       234
-#                                                23 - Williams v Taylor.txt  1715   8725       388
-#                                         24 - Palazzolo v Rhode Island.txt  1919   8602       401
-#                                                    25 - Alden v Maine.txt  2933  20241       886
-# summary(oconnor_corpus)
-# Corpus consisting of 26 documents:
-# 
-#                                                              Text Types Tokens Sentences
-#                   01 - Lackawanna County Dist Attorney v Coss.txt  1054   5039       273
-#                                             02 - Daniels v US.txt   925   3661       186
-#                       04 - Murphy v United Parcel Service Inc.txt   683   2693       106
-#                              05 - US Postal Service v Gregory.txt   808   2938       167
-#                            06 - City of Indianapolis v Edmond.txt  1381   5748       324
-#                                           07 - Martin v Hadix.txt  1156   6341       278
-#                                           08 - Seling v Young.txt  1268   5845       323
-#                        09 - Norfolk Southern Ry Co v Shanklin.txt  1036   5346       233
-#                                          10 - Penry v Johnson.txt  1361   7539       360
-#                          11 - Kolstad v American Dental Ass'n.txt  1610   7441       326
-#                            12 - Sutton v United Air Lines Inc.txt  1538   7735       293
-#                                          13 - Miller v French.txt  1660   8982       394
-#                 14 - Reeves v Sanderson Plumbing Products Inc.txt  1626   7540       366
-#                                  15 - Lopez v Monterey County.txt  1476   7782       369
-#                       16 - Lewis v Lewis And Clark Marine Inc.txt  1314   6730       369
-#                                          17 - Duncan v Walker.txt  1090   5331       233
-#                                      18 - Roe v Flores-Ortega.txt  1223   6069       252
-#                                  19 - City of Erie v Pap's AM.txt  1698   8116       391
-#                                    20 - O'Sullivan v Boerckel.txt   923   3936       205
-#                                       21 - Rogers v Tennessee.txt  1345   5969       264
-#  22 - Davis Next Friend LaShonda D v Monroe County Bd of Educ.txt  1786   9099       389
-#                            23 - Kimel v Florida Bd of Regents.txt  2089  12134       638
-#  24 - Food and Drug Admin v Brown And Williamson Tobacco Corp.txt  2456  15412       695
-#     25 - Department of Commerce v US House of Representatives.txt  2026  10140       466
-#                            26 - Lorillard Tobacco Co v Reilly.txt  2525  15546       840
-#          27 - Minnesota v Mille Lacs Band of Chippewa Indians.txt  2133  13684       702
-# summary(rehnquist_corpus)
-# Corpus consisting of 26 documents:
-# 
-#                                                                                  Text Types Tokens Sentences
-#                                            01 - Department of Army v Blue Fox Inc.txt   938   3685       157
-#                                                               02 - Conn v Gabbert.txt   743   2443       124
-#                                                                    03 - Bond v US.txt   570   1583        81
-#                                          04 - Lujan v G And G Fire Sprinklers Inc.txt   885   3573       182
-#                                     05 - Buckman Co v Plaintiffs' Legal Committee.txt  1165   4146       142
-#                                                           06 - Illinois v Wardlow.txt   713   2201       138
-#                                                                07 - Reno v Condon.txt   905   3424       150
-#                                                                 08 - US v Knights.txt   989   3408       168
-#                          09 - Los Angeles Police Dept v United Reporting Pub Corp.txt   931   3312       153
-#                                                                   10 - Ohler v US.txt   644   2375       104
-#                                                               11 - Wilson v Layne.txt  1383   5477       284
-#                                                             12 - Florida v Thomas.txt   668   2263       128
-#                                         13 - Correctional Services Corp v Malesko.txt  1251   5150       269
-#                                                                 14 - Texas v Cobb.txt  1120   4040       197
-#                                            15 - Atkinson Trading Co Inc v Shirley.txt  1257   5569       251
-#                                                             16 - Weeks v Angelone.txt  1042   4411       208
-#  17 - Buckhannon Bd and Care Home Inc v West Virginia Dept of Health and Human Re.txt  1261   5299       258
-#                                                                   18 - Neder v US.txt  1741   9683       432
-#                                                               19 - Dickerson v US.txt  1520   6537       391
-#                                                 20 - Boy Scouts of America v Dale.txt  1552   6898       314
-#      21 - Solid Waste Agency of Northern Cook County v US Army Corps of Engineers.txt  1317   5454       235
-#                                          22 - American Mfrs Mut Ins Co v Sullivan.txt  1536   7869       364
-#                                 23 - Green Tree Financial Corp-Alabama v Randolph.txt  1124   4735       211
-#             24 - Florida Prepaid Postsecondary Educ Expense Bd v College Sav Bank.txt  1632   7958       354
-#                         25 - Board of Trustees of University of Alabama v Garrett.txt  1582   6329       307
-#                                                                26 - US v Morrison.txt  2264  11670       583
-# summary(scalia_corpus)
-# Corpus consisting of 24 documents:
-# 
-#                                                                       Text Types Tokens Sentences
-#                                                   01 - Artuz v Bennett.txt   716   2479        92
-#                   02 - Your Home Visiting Nurse Services Inc v Shalala.txt   776   3022       120
-#                                                   03 - New York v Hill.txt  1014   3518       195
-#                             05 - Wal-Mart Stores Inc v Samara Bros Inc.txt   989   3886       126
-#             06 - Hartford Underwriters Ins Co v Union Planters Bank NA.txt  1253   5098       219
-#                    07 - Norfolk Shipbuilding And Drydock Corp v Garris.txt  1043   3889       214
-#                          08 - NLRB v Kentucky River Community Care Inc.txt  1347   6317       275
-#                                                        09 - Kyllo v US.txt  1319   4975       214
-#                                                 10 - Portuondo v Agard.txt  1448   5824       291
-#                          11 - Semtek Intern Inc v Lockheed Martin Corp.txt  1162   4789       206
-#                                               12 - Edwards v Carpenter.txt   684   2393       100
-#          13 - Grupo Mexicano de Desarrollo SA v Alliance Bond Fund Inc.txt  1741   7581       312
-#                            14 - US v Sun-Diamond Growers of California.txt  1278   5851       154
-#                          15 - Whitman v American Trucking Associations.txt  2048  10802       474
-#                                                16 - Wyoming v Houghton.txt  1115   4180       184
-#          17 - Grupo Mexicano de Desarrollo SA v Alliance Bond Fund Inc.txt  2027   9696       436
-#  18 - College Sav Bank v Florida Prepaid Postsecondary Educ Expense Bd.txt  2140  10115       478
-#           19 - Vermont Agency of Natural Resources v US ex rel Stevens.txt  2184  10465       491
-#                                   20 - Reno v Bossier Parish School Bd.txt  1574   8149       310
-#                                              21 - Alexander v Sandoval.txt  1608   7920       405
-#                               22 - California Democratic Party v Jones.txt  1671   7563       342
-#                23 - Reno v American-Arab Anti-Discrimination Committee.txt  1753   8384       278
-#                                 24 - AT And T Corp v Iowa Utilities Bd.txt  1831  10220       339
-#                                                    25 - Nevada v Hicks.txt  1713   8295       359
-# summary(thomas_corpus)
-# Corpus consisting of 23 documents:
-# 
-#                                                           Text Types Tokens Sentences
-#                                            01 - Jones v US.txt  2044  12766       606
-#          02 - Arizona Dept of Revenue v Blaze Const Co Inc.txt   739   2335       140
-#                                         03 - Shaw v Murphy.txt   903   3093       173
-#                                       04 - Florida v White.txt   705   2479       125
-#                                 05 - US v Rodriguez-Moreno.txt   705   2778       114
-#          06 - Director of Revenue of Missouri v CoBank ACB.txt   670   2936       116
-#                07 - Pollard v EI du Pont de Nemours And Co.txt   931   3987       158
-#                     08 - Cunningham v Hamilton County Ohio.txt  1243   4789       264
-#                                          09 - Sims v Apfel.txt   976   3587       200
-#                   10 - US v Oakland Cannabis Buyers' Co-op.txt  1250   5728       257
-#                                         11 - Beck v Prupis.txt  1211   5736       218
-#                                            12 - Baral v US.txt   742   3448       106
-#                    13 - Egelhoff v Egelhoff ex rel Breiner.txt  1053   3975       199
-#                                      14 - Hunt v Cromartie.txt  1245   5068       256
-#                                         15 - Gitlitz v CIR.txt   861   5312       185
-#        16 - JEM Ag Supply Inc v Pioneer Hi-Bred Intern Inc.txt  1554   7794       366
-#                                           17 - Carter v US.txt  1501   7479       323
-#                                          18 - Tyler v Cain.txt  1000   4926       240
-#                           19 - Christensen v Harris County.txt  1056   4602       197
-#                         20 - Hughes Aircraft Co v Jacobson.txt  1240   5632       248
-#  21 - Harris Trust and Sav Bank v Salomon Smith Barney Inc.txt  1215   6284       200
-#               22 - Good News Club v Milford Central School.txt  1555   7730       364
-#                                       23 - Smith v Robbins.txt  1953  11778       518
-```
-
-### Data Cleaning
-
-We will need to convert the text to lower case and remove any non-ASCII
-characters so that the texts can be compared for later analysis. The corpuses
-will be tokenized, English stop words (such as "the", "and" etc.) removed and
-the corpuses converted to document feature matrices (DFMs).
+Read the cleaned document feature matrices as *.rds* files from `opinions`
+folder. (See the `data_cleaning.Rmd` file for previous data cleaning steps).
 
 ```{r}
-## convert the corpus to all lower case
-opinion_lower <- tolower(opinion_corpus)
-kennedy_lower <- tolower(kennedy_corpus)
-oconnor_lower <- tolower(oconnor_corpus)
-rehnquist_lower <- tolower(rehnquist_corpus)
-scalia_lower <- tolower(scalia_corpus)
-thomas_lower <- tolower(thomas_corpus)
-
-## convert the coprpus into tokens
-opinion_tokes <- tokens(opinion_lower)
-kennedy_tokes <- tokens(kennedy_lower)
-oconnor_tokes <- tokens(oconnor_lower)
-rehnquist_tokes <- tokens(rehnquist_lower)
-scalia_tokes <- tokens(scalia_lower)
-thomas_tokes <- tokens(thomas_lower)
-
-## remove stop words from corpus
-opinion_nostop <- tokens_select(opinion_tokes, pattern = stopwords('en'),
-                                selection = 'remove')
-kennedy_nostop <- tokens_select(kennedy_tokes, pattern = stopwords('en'),
-                                selection = 'remove')
-oconnor_nostop <- tokens_select(oconnor_tokes, pattern = stopwords('en'),
-                                selection = 'remove')
-rehnquist_nostop <- tokens_select(rehnquist_tokes, pattern = stopwords('en'),
-                                selection = 'remove')
-scalia_nostop <- tokens_select(scalia_tokes, pattern = stopwords('en'),
-                                selection = 'remove')
-thomas_nostop <- tokens_select(thomas_tokes, pattern = stopwords('en'),
-                                selection = 'remove')
-
-## remove numbers and punctuation from corpus
-opinion_cleaned <- tokens_remove(tokens(opinion_nostop, remove_punct = TRUE,
-                                 remove_numbers = TRUE), stopwords("english"))
-kennedy_cleaned <- tokens_remove(tokens(kennedy_nostop, remove_punct = TRUE,
-                                 remove_numbers = TRUE), stopwords("english"))
-oconnor_cleaned <- tokens_remove(tokens(oconnor_nostop, remove_punct = TRUE,
-                                 remove_numbers = TRUE), stopwords("english"))
-rehnquist_cleaned <- tokens_remove(tokens(rehnquist_nostop, remove_punct = TRUE,
-                                   remove_numbers = TRUE), stopwords("english"))
-scalia_cleaned <- tokens_remove(tokens(scalia_nostop, remove_punct = TRUE,
-                                 remove_numbers = TRUE), stopwords("english"))
-thomas_cleaned <- tokens_remove(tokens(thomas_nostop, remove_punct = TRUE,
-                                remove_numbers = TRUE), stopwords("english"))
-
-## Create the corpus dfm
-opinion_dfm <- dfm(opinion_cleaned)
-kennedy_dfm <- dfm(kennedy_cleaned)
-oconnor_dfm <- dfm(oconnor_cleaned)
-rehnquist_dfm <- dfm(rehnquist_cleaned)
-scalia_dfm <- dfm(scalia_cleaned)
-thomas_dfm <- dfm(thomas_cleaned)
+readRDS("./opinions/dfms/opinion_dfm.rds")
+readRDS("./opinions/dfms/kennedy_dfm.rds")
+readRDS("./opinions/dfms/oconnor_dfm.rds")
+readRDS("./opinions/dfms/rehnquist_dfm.rds")
+readRDS("./opinions/dfms/scalia_dfm.rds")
+readRDS("./opinions/dfms/thomas_dfm.rds")
 ```
 
 ### Top Features
@@ -376,7 +141,6 @@ p6 <- textstat_frequency(thomas_dfm) %>%
 grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 3,
              top = "Top 20 terms for each document corpus")
 ```
-
 
 ### Comparing Document Similarity by Cosine Distance
 
@@ -581,6 +345,162 @@ N-grams are a sequence of tokens from already tokenized text objects.
 ## where we left off with quanteda
 ## https://tutorials.quanteda.io/basic-operations/fcm/fcm/
 # toks_ngram <- tokens_ngrams(toks, n = 2:4)
+```
+
+### TD-IDF
+
+[Term frequency–inverse document frequency (TD-IDF)](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)
+is a numerical statistic that is intended to reflect how important a word is to
+a document in a collection or corpus. It is often used as a weighting factor in
+searches of information retrieval, text mining, and user modeling. The tf–idf
+value increases proportionally to the number of times a word appears in the
+document and is offset by the number of documents in the corpus that contain the
+word, which helps to adjust for the fact that some words appear more frequently
+in general. The algorithm works as follows:
+
+* The weight of a term that occurs in a document is simply proportional to the
+term frequency. 
+
+* The specificity of a term can be quantified as an inverse function of the
+number of documents in which it occurs. 
+
+```{r}
+#library("tidytext")
+# https://www.tidytextmining.com/tfidf.html
+
+library(dplyr)
+library(janeaustenr)
+library(tidytext)
+
+book_words <- austen_books() %>%
+  unnest_tokens(word, text) %>%
+  count(book, word, sort = TRUE)
+
+total_words <- book_words %>% 
+  group_by(book) %>% 
+  summarize(total = sum(n))
+
+book_words <- left_join(book_words, total_words)
+
+book_words
+```
+
+There is one row in this book_words data frame for each word-book combination;
+n is the number of times that word is used in that book and total is the total
+words in that book. The usual suspects are here with the highest n, "the",
+"and", "to"", and so forth. In Figure 3.1, let’s look at the distribution of
+n/total for each novel, the number of times a word appears in a novel divided by
+the total number of terms (words) in that novel. This is exactly what term
+frequency is.
+
+```{r}
+library(ggplot2)
+
+ggplot(book_words, aes(n/total, fill = book)) +
+  geom_histogram(show.legend = FALSE) +
+  xlim(NA, 0.0009) +
+  facet_wrap(~book, ncol = 2, scales = "free_y")
+```
+
+There are very long tails to the right for these novels (those extremely rare
+words!) that we have not shown in these plots. These plots exhibit similar
+distributions for all the novels, with many words that occur rarely and fewer
+words that occur frequently.
+
+#### Zipf's Law
+
+Zipf's law states that the frequency that a word appears is inversely
+proportional to its rank. 
+
+```{r}
+freq_by_rank <- book_words %>% 
+  group_by(book) %>% 
+  mutate(rank = row_number(), 
+         `term frequency` = n/total)
+
+freq_by_rank
+```
+
+The rank column here tells us the rank of each word within the frequency table;
+the table was already ordered by n so we could use row_number() to find the
+rank. Then, we can calculate the term frequency in the same way we did before.
+Zipf’s law is often visualized by plotting rank on the x-axis and term frequency
+on the y-axis, on logarithmic scales. Plotting this way, an inversely
+proportional relationship will have a constant, negative slope.
+
+```{r}
+freq_by_rank %>% 
+  ggplot(aes(rank, `term frequency`, color = book)) + 
+  geom_line(size = 1.1, alpha = 0.8, show.legend = FALSE) + 
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+Notice that Figure 3.2 is in log-log coordinates. We see that all six of Jane
+Austen’s novels are similar to each other, and that the relationship between
+rank and frequency does have negative slope. It is not quite constant, though;
+perhaps we could view this as a broken power law with, say, three sections.
+Let’s see what the exponent of the power law is for the middle section of the
+rank range.
+
+```{r}
+rank_subset <- freq_by_rank %>% 
+  filter(rank < 500,
+         rank > 10)
+
+lm(log10(`term frequency`) ~ log10(rank), data = rank_subset)
+```
+
+And we have in fact gotten a slope close to -1 here. Let’s plot this fitted
+power law with the data in Figure 3.3 to see how it looks.
+
+* frequency is proportional to 1 over *rank* 
+
+```{r}
+freq_by_rank %>% 
+  ggplot(aes(rank, `term frequency`, color = book)) + 
+  geom_abline(intercept = -0.62, slope = -1.1, color = "gray50", linetype = 2) +
+  geom_line(size = 1.1, alpha = 0.8, show.legend = FALSE) + 
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+We have found a result close to the classic version of Zipf’s law for the corpus
+of Jane Austen’s novels. The deviations we see here at high rank are not
+uncommon for many kinds of language; a corpus of language often contains fewer
+rare words than predicted by a single power law. The deviations at low rank are
+more unusual. Jane Austen uses a lower percentage of the most common words than
+many collections of language. This kind of analysis could be extended to compare
+authors, or to compare any other collections of text; it can be implemented
+simply using tidy data principles.
+
+```{r}
+book_words <- book_words %>%
+  bind_tf_idf(word, book, n)
+
+book_words
+```
+
+Notice that idf and thus tf-idf are zero for these extremely common words.
+
+```{r}
+book_words %>%
+  select(-total) %>%
+  arrange(desc(tf_idf))
+```
+
+```{r}
+book_words %>%
+  arrange(desc(tf_idf)) %>%
+  mutate(word = factor(word, levels = rev(unique(word)))) %>% 
+  group_by(book) %>% 
+  top_n(15) %>% 
+  ungroup() %>%
+  ggplot(aes(word, tf_idf, fill = book)) +
+  geom_col(show.legend = FALSE) +
+  labs(x = NULL, y = "tf-idf") +
+  facet_wrap(~book, ncol = 2, scales = "free") +
+  coord_flip()
 ```
 
 ### Naive Bayes
