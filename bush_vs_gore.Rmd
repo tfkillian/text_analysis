@@ -31,7 +31,6 @@ the period 1999-2001 for comparison to the [Bush v. Gore 2000](https://www.law.c
 opinion, in order to ascertain the probable author of this document.
 
 ```{r load_libraries}
-library("readtext")
 library("quanteda")
 library("dplyr")
 library("readtext")

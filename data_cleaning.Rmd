@@ -34,10 +34,6 @@ opinion, in order to ascertain the probable author of this document.
 library("readtext")
 library("quanteda")
 library("dplyr")
-library("readtext")
-library("ggplot2")
-library("tm")
-library("gridExtra")
 set.seed(123)
 ```
 
@@ -69,6 +65,26 @@ THOMAS <- system.file("./opinions/Thomas/", package = "readtext")
 thomas <- readtext(paste0(THOMAS, "./opinions/Thomas/*"))
 ```
 
+```{r}
+kennedy
+```
+
+```{r}
+oconnor
+```
+
+```{r}
+rehnquist
+```
+
+```{r}
+scalia
+```
+
+```{r}
+thomas
+```
+
 ### Corpus Generation
 
 [Corpuses](https://tutorials.quanteda.io/basic-operations/corpus/corpus/) for
@@ -84,156 +100,6 @@ oconnor_corpus <- corpus(oconnor)
 rehnquist_corpus <- corpus(rehnquist)
 scalia_corpus <- corpus(scalia)
 thomas_corpus <- corpus(thomas)
-
-# summary(opinion_corpus)
-# Corpus consisting of 1 document:
-# 
-#             Text Types Tokens Sentences
-#  Bush_v_Gore.txt  1066   4049       168
-# summary(kennedy_corpus)
-# Corpus consisting of 25 documents:
-# 
-#                                                                      Text Types Tokens Sentences
-#               01 - City of Monterey v Del Monte Dunes at Monterey Ltd.txt  2224  12227       578
-#                                                      02 - Glover v US.txt   732   2444       120
-#                                    03 - City of West Covina v Perkins.txt   907   3271       159
-#                                            04 - INS v Aguirre-Aguirre.txt  1303   6408       309
-#                                           05 - US v Haggar Apparel Co.txt  1155   4846       211
-#                                                     06 - Peguero v US.txt   650   2536       118
-#                                                     07 - US v Johnson.txt   732   2642       113
-#                     08 - TrafFix Devices Inc v Marketing Displays Inc.txt  1026   4269       190
-#                                            09 - US v United Foods Inc.txt  1087   4020       210
-#                                                       10 - US v Locke.txt  1975   9406       447
-#                                                     11 - Fischer v US.txt  1208   4985       200
-#                                                    12 - Mitchell v US.txt  1388   5827       275
-#                                  13 - Legal Services Corp v Velazquez.txt  1306   5165       242
-#                                                   14 - Saucier v Katz.txt  1195   5055       227
-#  15 - Board of Regents of University of Wisconsin System v Southworth.txt  1469   5984       305
-#                                                  16 - Rice v Cayetano.txt  2306  10397       530
-#                                                   17 - Garner v Jones.txt  1079   4593       236
-#                                            18 - Tuan Anh Nguyen v INS.txt  1465   7039       284
-#                                  19 - Circuit City Stores Inc v Adams.txt  1417   6384       268
-#                                                 20 - Slack v McDaniel.txt   989   5090       245
-#                             21 - US v Playboy Entertainment Group Inc.txt  1903   8539       417
-#                  22 - Amoco Production Co v Southern Ute Indian Tribe.txt  1337   5242       234
-#                                                23 - Williams v Taylor.txt  1715   8725       388
-#                                         24 - Palazzolo v Rhode Island.txt  1919   8602       401
-#                                                    25 - Alden v Maine.txt  2933  20241       886
-# summary(oconnor_corpus)
-# Corpus consisting of 26 documents:
-# 
-#                                                              Text Types Tokens Sentences
-#                   01 - Lackawanna County Dist Attorney v Coss.txt  1054   5039       273
-#                                             02 - Daniels v US.txt   925   3661       186
-#                       04 - Murphy v United Parcel Service Inc.txt   683   2693       106
-#                              05 - US Postal Service v Gregory.txt   808   2938       167
-#                            06 - City of Indianapolis v Edmond.txt  1381   5748       324
-#                                           07 - Martin v Hadix.txt  1156   6341       278
-#                                           08 - Seling v Young.txt  1268   5845       323
-#                        09 - Norfolk Southern Ry Co v Shanklin.txt  1036   5346       233
-#                                          10 - Penry v Johnson.txt  1361   7539       360
-#                          11 - Kolstad v American Dental Ass'n.txt  1610   7441       326
-#                            12 - Sutton v United Air Lines Inc.txt  1538   7735       293
-#                                          13 - Miller v French.txt  1660   8982       394
-#                 14 - Reeves v Sanderson Plumbing Products Inc.txt  1626   7540       366
-#                                  15 - Lopez v Monterey County.txt  1476   7782       369
-#                       16 - Lewis v Lewis And Clark Marine Inc.txt  1314   6730       369
-#                                          17 - Duncan v Walker.txt  1090   5331       233
-#                                      18 - Roe v Flores-Ortega.txt  1223   6069       252
-#                                  19 - City of Erie v Pap's AM.txt  1698   8116       391
-#                                    20 - O'Sullivan v Boerckel.txt   923   3936       205
-#                                       21 - Rogers v Tennessee.txt  1345   5969       264
-#  22 - Davis Next Friend LaShonda D v Monroe County Bd of Educ.txt  1786   9099       389
-#                            23 - Kimel v Florida Bd of Regents.txt  2089  12134       638
-#  24 - Food and Drug Admin v Brown And Williamson Tobacco Corp.txt  2456  15412       695
-#     25 - Department of Commerce v US House of Representatives.txt  2026  10140       466
-#                            26 - Lorillard Tobacco Co v Reilly.txt  2525  15546       840
-#          27 - Minnesota v Mille Lacs Band of Chippewa Indians.txt  2133  13684       702
-# summary(rehnquist_corpus)
-# Corpus consisting of 26 documents:
-# 
-#                                                                                  Text Types Tokens Sentences
-#                                            01 - Department of Army v Blue Fox Inc.txt   938   3685       157
-#                                                               02 - Conn v Gabbert.txt   743   2443       124
-#                                                                    03 - Bond v US.txt   570   1583        81
-#                                          04 - Lujan v G And G Fire Sprinklers Inc.txt   885   3573       182
-#                                     05 - Buckman Co v Plaintiffs' Legal Committee.txt  1165   4146       142
-#                                                           06 - Illinois v Wardlow.txt   713   2201       138
-#                                                                07 - Reno v Condon.txt   905   3424       150
-#                                                                 08 - US v Knights.txt   989   3408       168
-#                          09 - Los Angeles Police Dept v United Reporting Pub Corp.txt   931   3312       153
-#                                                                   10 - Ohler v US.txt   644   2375       104
-#                                                               11 - Wilson v Layne.txt  1383   5477       284
-#                                                             12 - Florida v Thomas.txt   668   2263       128
-#                                         13 - Correctional Services Corp v Malesko.txt  1251   5150       269
-#                                                                 14 - Texas v Cobb.txt  1120   4040       197
-#                                            15 - Atkinson Trading Co Inc v Shirley.txt  1257   5569       251
-#                                                             16 - Weeks v Angelone.txt  1042   4411       208
-#  17 - Buckhannon Bd and Care Home Inc v West Virginia Dept of Health and Human Re.txt  1261   5299       258
-#                                                                   18 - Neder v US.txt  1741   9683       432
-#                                                               19 - Dickerson v US.txt  1520   6537       391
-#                                                 20 - Boy Scouts of America v Dale.txt  1552   6898       314
-#      21 - Solid Waste Agency of Northern Cook County v US Army Corps of Engineers.txt  1317   5454       235
-#                                          22 - American Mfrs Mut Ins Co v Sullivan.txt  1536   7869       364
-#                                 23 - Green Tree Financial Corp-Alabama v Randolph.txt  1124   4735       211
-#             24 - Florida Prepaid Postsecondary Educ Expense Bd v College Sav Bank.txt  1632   7958       354
-#                         25 - Board of Trustees of University of Alabama v Garrett.txt  1582   6329       307
-#                                                                26 - US v Morrison.txt  2264  11670       583
-# summary(scalia_corpus)
-# Corpus consisting of 24 documents:
-# 
-#                                                                       Text Types Tokens Sentences
-#                                                   01 - Artuz v Bennett.txt   716   2479        92
-#                   02 - Your Home Visiting Nurse Services Inc v Shalala.txt   776   3022       120
-#                                                   03 - New York v Hill.txt  1014   3518       195
-#                             05 - Wal-Mart Stores Inc v Samara Bros Inc.txt   989   3886       126
-#             06 - Hartford Underwriters Ins Co v Union Planters Bank NA.txt  1253   5098       219
-#                    07 - Norfolk Shipbuilding And Drydock Corp v Garris.txt  1043   3889       214
-#                          08 - NLRB v Kentucky River Community Care Inc.txt  1347   6317       275
-#                                                        09 - Kyllo v US.txt  1319   4975       214
-#                                                 10 - Portuondo v Agard.txt  1448   5824       291
-#                          11 - Semtek Intern Inc v Lockheed Martin Corp.txt  1162   4789       206
-#                                               12 - Edwards v Carpenter.txt   684   2393       100
-#          13 - Grupo Mexicano de Desarrollo SA v Alliance Bond Fund Inc.txt  1741   7581       312
-#                            14 - US v Sun-Diamond Growers of California.txt  1278   5851       154
-#                          15 - Whitman v American Trucking Associations.txt  2048  10802       474
-#                                                16 - Wyoming v Houghton.txt  1115   4180       184
-#          17 - Grupo Mexicano de Desarrollo SA v Alliance Bond Fund Inc.txt  2027   9696       436
-#  18 - College Sav Bank v Florida Prepaid Postsecondary Educ Expense Bd.txt  2140  10115       478
-#           19 - Vermont Agency of Natural Resources v US ex rel Stevens.txt  2184  10465       491
-#                                   20 - Reno v Bossier Parish School Bd.txt  1574   8149       310
-#                                              21 - Alexander v Sandoval.txt  1608   7920       405
-#                               22 - California Democratic Party v Jones.txt  1671   7563       342
-#                23 - Reno v American-Arab Anti-Discrimination Committee.txt  1753   8384       278
-#                                 24 - AT And T Corp v Iowa Utilities Bd.txt  1831  10220       339
-#                                                    25 - Nevada v Hicks.txt  1713   8295       359
-# summary(thomas_corpus)
-# Corpus consisting of 23 documents:
-# 
-#                                                           Text Types Tokens Sentences
-#                                            01 - Jones v US.txt  2044  12766       606
-#          02 - Arizona Dept of Revenue v Blaze Const Co Inc.txt   739   2335       140
-#                                         03 - Shaw v Murphy.txt   903   3093       173
-#                                       04 - Florida v White.txt   705   2479       125
-#                                 05 - US v Rodriguez-Moreno.txt   705   2778       114
-#          06 - Director of Revenue of Missouri v CoBank ACB.txt   670   2936       116
-#                07 - Pollard v EI du Pont de Nemours And Co.txt   931   3987       158
-#                     08 - Cunningham v Hamilton County Ohio.txt  1243   4789       264
-#                                          09 - Sims v Apfel.txt   976   3587       200
-#                   10 - US v Oakland Cannabis Buyers' Co-op.txt  1250   5728       257
-#                                         11 - Beck v Prupis.txt  1211   5736       218
-#                                            12 - Baral v US.txt   742   3448       106
-#                    13 - Egelhoff v Egelhoff ex rel Breiner.txt  1053   3975       199
-#                                      14 - Hunt v Cromartie.txt  1245   5068       256
-#                                         15 - Gitlitz v CIR.txt   861   5312       185
-#        16 - JEM Ag Supply Inc v Pioneer Hi-Bred Intern Inc.txt  1554   7794       366
-#                                           17 - Carter v US.txt  1501   7479       323
-#                                          18 - Tyler v Cain.txt  1000   4926       240
-#                           19 - Christensen v Harris County.txt  1056   4602       197
-#                         20 - Hughes Aircraft Co v Jacobson.txt  1240   5632       248
-#  21 - Harris Trust and Sav Bank v Salomon Smith Barney Inc.txt  1215   6284       200
-#               22 - Good News Club v Milford Central School.txt  1555   7730       364
-#                                       23 - Smith v Robbins.txt  1953  11778       518
 ```
 
 ### Data Cleaning
@@ -287,6 +153,9 @@ scalia_cleaned <- tokens_remove(tokens(scalia_nostop, remove_punct = TRUE,
                                  remove_numbers = TRUE), stopwords("english"))
 thomas_cleaned <- tokens_remove(tokens(thomas_nostop, remove_punct = TRUE,
                                 remove_numbers = TRUE), stopwords("english"))
+
+# to remove extra words/tokens, we can remove on "pattern"
+# pattern = c('immig*', 'migra*')
 
 ## Create the corpus dfm
 opinion_dfm <- dfm(opinion_cleaned)
